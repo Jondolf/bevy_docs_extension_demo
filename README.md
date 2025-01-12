@@ -2,9 +2,6 @@
 
 A crate for testing [rustdoc] extensions and configurations for the [Bevy game engine].
 
-See [`./docs-rs`](./docs-rs) for implemented extensions and how to use them,
-and [`Cargo.toml`](./Cargo.toml) for the configuration passed to [docs.rs] for building the crate.
-
 ## Building Locally
 
 To apply the documentation extensions in this directory, you must provide `cargo doc`
@@ -38,6 +35,8 @@ with the following configuration:
 [package.metadata.docs.rs]
 rustdoc-args = ["--html-after-content", "docs-rs/trait-tags.html"]
 ```
+
+See [`Cargo.toml`](./Cargo.toml) for the configuration passed to [docs.rs] for building this crate.
 
 [docs.rs]: https://docs.rs
 [rustdoc]: https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html
