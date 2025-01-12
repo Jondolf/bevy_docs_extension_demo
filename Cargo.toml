@@ -10,7 +10,7 @@ repository = "https://github.com/Jondolf/bevy_docs_extension_demo"
 readme = "README.md"
 
 [dependencies]
-bevy = "0.15"
+bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
 
 [package.metadata.docs.rs]
 rustdoc-args = [

@@ -6,7 +6,7 @@
     // This extension should be passed to `rustdoc` using the `--html-after-content` flag.
 
     // Traits that we want to show as tags.
-    const bevyTraits = new Set(['Component', 'Resource', 'Event', 'Plugin']);    
+    const bevyTraits = new Set(['Component', 'Resource', 'Event', 'Plugin', 'PluginGroup']);    
 
     // Find all traits that are implemented by the current type.
     const implementedTraits = findImplementedTraits().entries();
@@ -24,16 +24,29 @@
         tagContainer.className = 'bevy-tag-container';
         heading.appendChild(tagContainer);
 
+        // Check if an implemented trait has a `type Mutability = Immutable` associated type.
+        // This is used to determine if a `Component` is immutable or not.
+        // TODO: Ideally we should just check the associated types of the `Component` trait,
+        //       but the docs.rs layout makes it tricky to do so in a robust wau.
+        const associatedTypeHeader = document.querySelectorAll(".trait-impl.associatedtype .code-header");
+        const isImmutable = [...associatedTypeHeader].some(el => el.innerText.includes('type Mutability = Immutable'));
+
         // Create a tag for each implemented trait.
-        for (const [traitName, href] of implementedBevyTraits) {
-            // Every `Event` also implements `Component`, but it is extremely rare
-            // to actually use events as components, so we skip the component tag for them.
-            if (traitName == 'Component' && implementedBevyTraits.has('Event')) {
-                continue;
+        for (let [tagName, href] of implementedBevyTraits) {
+            if (tagName == 'Component') {
+                // Every `Event` also implements `Component`, but it is extremely rare
+                // to actually use events as components, so we skip the component tag for them.
+                if (implementedBevyTraits.has('Event')) {
+                    continue;
+                }
+
+                if (isImmutable) {
+                    tagName = 'Immutable Component';
+                }
             }
 
             // Create the tag and append it to the container.
-            tagContainer.appendChild(createBevyTag(traitName, href));
+            tagContainer.appendChild(createBevyTag(tagName, href));
         }
     }
 
@@ -48,26 +61,14 @@
         );
 
         for (const header of allTraitHeaders) {
-            let traitName;
-            let href;
+            // We can extract the trait name by removing any generics and splitting the string by spaces.
+            // This results in ['impl', 'TraitName', 'for', 'TypeName'].
+            const traitName = removeGenerics(header.innerText).split(' ')[1].trim();
 
-            // Find the trait link element if it exists.
+            // Find the link to the trait if the anchor element exists.
             // Otherwise, the trait is just in plain text.
-            const traitLinkEl = header.children[0];
-            
-            if (traitLinkEl?.classList.contains('trait')) {
-                href = traitLinkEl.getAttribute('href');
-                
-                // The href is of the form 'path/to/trait.TraitName.html'.
-                const parts = href.split('.');
-                traitName = parts[parts.length - 2];
-            } else {
-                // The trait link is not available, so it's just in plain text
-                // in the form 'impl TraitName for Type'.
-                //
-                // We can extract the trait name by removing any generics and splitting the string by spaces.
-                traitName = removeGenerics(header.innerText).split(' ')[1].trim();
-            }
+            const traitLinkEl = [...header.children].find(el => el.getAttribute('href')?.includes(`trait.${traitName}.html`));
+            const href = traitLinkEl?.getAttribute('href');
 
             implementedTraits.set(traitName, href);
         }
@@ -94,13 +95,14 @@
     // if available.
     function createBevyTag(tagName, href) {
         const el = document.createElement('a');
+        const kebabCaseName = tagName.toLowerCase().replace(' ', '-');
         
         if (href) {
             el.setAttribute('href', href);
         }
 
         el.innerText = tagName;
-        el.className = `bevy-tag ${tagName.toLowerCase()}-tag`;
+        el.className = `bevy-tag ${kebabCaseName}-tag`;
         return el;
     }
 </script>
@@ -139,7 +141,7 @@
         background-color: oklch(0.475 0.1 200);
     }
 
-    .bevy-tag.plugin-tag {
+    .bevy-tag.plugin-tag, .bevy-tag.plugingroup-tag {
         color: oklch(0.85 0.1 60);
         background-color: oklch(0.475 0.1 60);
     }
