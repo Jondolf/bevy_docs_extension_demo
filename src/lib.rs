@@ -6,7 +6,7 @@
 /// A re-export of Bevy.
 pub use bevy;
 
-use bevy::prelude::*;
+use bevy::{app::PluginGroupBuilder, prelude::*};
 
 /// An example of a [`Component`] type.
 ///
@@ -15,6 +15,9 @@ use bevy::prelude::*;
 /// - [`TestResource`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestSystemSet`]
+/// - [`TestAllTraits`]
 #[derive(Component)]
 pub struct TestComponent;
 
@@ -25,6 +28,9 @@ pub struct TestComponent;
 /// - [`TestComponent`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestSystemSet`]
+/// - [`TestAllTraits`]
 #[derive(Resource)]
 pub struct TestResource;
 
@@ -35,6 +41,9 @@ pub struct TestResource;
 /// - [`TestComponent`]
 /// - [`TestResource`]
 /// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestSystemSet`]
+/// - [`TestAllTraits`]
 #[derive(Event)]
 pub struct TestEvent;
 
@@ -45,10 +54,75 @@ pub struct TestEvent;
 /// - [`TestComponent`]
 /// - [`TestResource`]
 /// - [`TestEvent`]
+/// - [`TestPluginGroup`]
+/// - [`TestSystemSet`]
+/// - [`TestAllTraits`]
 pub struct TestPlugin;
 
 impl Plugin for TestPlugin {
     fn build(&self, _app: &mut App) {
         println!("Hello from `TestPlugin`!")
+    }
+}
+
+/// An example of a [`PluginGroup`] type.
+///
+/// # Other Test Types
+///
+/// - [`TestComponent`]
+/// - [`TestResource`]
+/// - [`TestEvent`]
+/// - [`TestPlugin`]
+/// - [`TestSystemSet`]
+/// - [`TestAllTraits`]
+pub struct TestPluginGroup;
+
+impl PluginGroup for TestPluginGroup {
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>().add(TestPlugin)
+    }
+}
+
+/// An example of a [`SystemSet`] type.
+///
+/// # Other Test Types
+///
+/// - [`TestComponent`]
+/// - [`TestResource`]
+/// - [`TestEvent`]
+/// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestAllTraits`]
+#[derive(SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum TestSystemSet {
+    A,
+    B,
+}
+
+/// An example of a type that implements all the relevant ECS traits.
+///
+/// **Note**: The tag for `Component` may be hidden because `Event` is also implemented.
+/// This is done to avoid confusion, because every `Event` implements `Component`,
+/// but they are typically not intended to be used as components.
+///
+/// # Other Test Types
+///
+/// - [`TestComponent`]
+/// - [`TestResource`]
+/// - [`TestEvent`]
+/// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+#[derive(Resource, Event, SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct TestAllTraits;
+
+impl Plugin for TestAllTraits {
+    fn build(&self, _app: &mut App) {
+        println!("Hello from `AllTraits`!")
+    }
+}
+
+impl PluginGroup for TestAllTraits {
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>().add(TestAllTraits)
     }
 }
