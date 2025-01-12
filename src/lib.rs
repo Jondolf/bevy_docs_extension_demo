@@ -50,7 +50,6 @@ pub struct TestResource;
 ///
 /// - [`TestComponent`]
 /// - [`TestResource`]
-/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
 /// - [`TestPluginGroup`]
