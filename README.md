@@ -43,3 +43,12 @@ rustdoc-args = ["--html-after-content", "docs-rs/trait-tags.html"]
 [rustdoc]: https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html
 [`rustdoc` documentation]: https://doc.rust-lang.org/rustdoc/command-line-arguments.html
 [Bevy game engine]: https://bevyengine.org
+
+## License
+
+All code in this repository is dual-licensed under either:
+
+- MIT License ([LICENSE-MIT](/LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+- Apache License, Version 2.0 ([LICENSE-APACHE](/LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+
+at your option.
