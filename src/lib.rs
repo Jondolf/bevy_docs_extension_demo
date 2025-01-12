@@ -6,17 +6,24 @@
 /// A re-export of Bevy.
 pub use bevy;
 
-use bevy::{app::PluginGroupBuilder, prelude::*};
+use bevy::{
+    app::PluginGroupBuilder,
+    ecs::{schedule::ScheduleLabel, system::SystemParam},
+    prelude::*,
+};
 
 /// An example of a [`Component`] type.
 ///
 /// # Other Test Types
 ///
 /// - [`TestResource`]
+/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
 /// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
 /// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
 /// - [`TestAllTraits`]
 #[derive(Component)]
 pub struct TestComponent;
@@ -26,13 +33,33 @@ pub struct TestComponent;
 /// # Other Test Types
 ///
 /// - [`TestComponent`]
+/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
 /// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
 /// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
 /// - [`TestAllTraits`]
 #[derive(Resource)]
 pub struct TestResource;
+
+/// An example of an [`Asset`] type.
+///
+/// # Other Test Types
+///
+/// - [`TestComponent`]
+/// - [`TestResource`]
+/// - [`TestAsset`]
+/// - [`TestEvent`]
+/// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
+/// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
+/// - [`TestAllTraits`]
+#[derive(Asset, Reflect)]
+pub struct TestAsset;
 
 /// An example of an [`Event`] type.
 ///
@@ -40,9 +67,12 @@ pub struct TestResource;
 ///
 /// - [`TestComponent`]
 /// - [`TestResource`]
+/// - [`TestAsset`]
 /// - [`TestPlugin`]
 /// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
 /// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
 /// - [`TestAllTraits`]
 #[derive(Event)]
 pub struct TestEvent;
@@ -53,9 +83,12 @@ pub struct TestEvent;
 ///
 /// - [`TestComponent`]
 /// - [`TestResource`]
+/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
 /// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
 /// - [`TestAllTraits`]
 pub struct TestPlugin;
 
@@ -71,9 +104,12 @@ impl Plugin for TestPlugin {
 ///
 /// - [`TestComponent`]
 /// - [`TestResource`]
+/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
+/// - [`TestScheduleLabel`]
 /// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
 /// - [`TestAllTraits`]
 pub struct TestPluginGroup;
 
@@ -83,21 +119,56 @@ impl PluginGroup for TestPluginGroup {
     }
 }
 
+/// An example of a [`ScheduleLabel`] type.
+///
+/// # Other Test Types
+///
+/// - [`TestComponent`]
+/// - [`TestResource`]
+/// - [`TestAsset`]
+/// - [`TestEvent`]
+/// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
+/// - [`TestAllTraits`]
+#[derive(ScheduleLabel, Clone, Copy, Debug, PartialEq, Eq, Hash, Reflect)]
+pub struct TestScheduleLabel;
+
 /// An example of a [`SystemSet`] type.
 ///
 /// # Other Test Types
 ///
 /// - [`TestComponent`]
 /// - [`TestResource`]
+/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
 /// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
+/// - [`TestSystemParam`]
 /// - [`TestAllTraits`]
 #[derive(SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum TestSystemSet {
     A,
     B,
 }
+
+/// An example of a [`SystemParam`] type.
+///
+/// # Other Test Types
+///
+/// - [`TestComponent`]
+/// - [`TestResource`]
+/// - [`TestAsset`]
+/// - [`TestEvent`]
+/// - [`TestPlugin`]
+/// - [`TestPluginGroup`]
+/// - [`TestScheduleLabel`]
+/// - [`TestSystemSet`]
+/// - [`TestAllTraits`]
+#[derive(SystemParam)]
+pub struct TestSystemParam;
 
 /// An example of a type that implements all the relevant ECS traits.
 ///
@@ -109,10 +180,28 @@ pub enum TestSystemSet {
 ///
 /// - [`TestComponent`]
 /// - [`TestResource`]
+/// - [`TestAsset`]
 /// - [`TestEvent`]
 /// - [`TestPlugin`]
 /// - [`TestPluginGroup`]
-#[derive(Resource, Event, SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+/// - [`TestScheduleLabel`]
+/// - [`TestSystemSet`]
+/// - [`TestSystemParam`]
+#[derive(
+    Resource,
+    Asset,
+    Event,
+    ScheduleLabel,
+    SystemSet,
+    SystemParam,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Reflect,
+)]
 pub struct TestAllTraits;
 
 impl Plugin for TestAllTraits {

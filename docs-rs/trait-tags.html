@@ -6,7 +6,17 @@
     // This extension should be passed to `rustdoc` using the `--html-after-content` flag.
 
     // Traits that we want to show as tags.
-    const bevyTraits = new Set(['Component', 'Resource', 'Event', 'Plugin', 'PluginGroup', 'SystemSet']);    
+    const bevyTraits = new Set([
+        'Component',
+        'Resource',
+        'Asset',
+        'Event',
+        'Plugin',
+        'PluginGroup',
+        'ScheduleLabel',
+        'SystemSet',
+        'SystemParam',
+    ]);    
 
     // Find all traits that are implemented by the current type.
     const implementedTraits = findImplementedTraits().entries();
@@ -135,6 +145,10 @@
         background-color: oklch(0.475 0.1 130);
     }
 
+    .bevy-tag.asset-tag {
+        background-color: oklch(0.475 0.1 95);
+    }
+
     .bevy-tag.event-tag {
         background-color: oklch(0.475 0.1 200);
     }
@@ -143,7 +157,11 @@
         background-color: oklch(0.475 0.1 60);
     }
 
-    .bevy-tag.systemset-tag {
+    .bevy-tag.schedulelabel-tag, .bevy-tag.systemset-tag {
         background-color: oklch(0.475 0.1 0);
+    }
+
+    .bevy-tag.systemparam-tag {
+        background-color: oklch(0.475 0.1 260);
     }
 </style>
