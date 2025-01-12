@@ -1,0 +1,13 @@
+[package]
+name = "bevy_docs_extension_demo"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Joona Aalto <jondolf.dev@gmail.com>"]
+description = "A crate for testing rustdoc extensions for Bevy"
+documentation = "https://docs.rs/bevy_docs_extension_demo"
+repository = "https://github.com/Jondolf/bevy_docs_extension_demo"
+readme = "README.md"
+
+[dependencies]
+bevy = "0.15"
