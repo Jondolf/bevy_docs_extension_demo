@@ -30,7 +30,7 @@ RUSTDOCFLAGS="--html-after-content path/to/docs-rs/trait-tags.html" cargo doc
 
 ## Building on Docs.rs
 
-Extentions can be applied to docs.rs builds by providing the relevant arguments
+Extensions can be applied to [docs.rs] builds by providing the relevant arguments
 for `rustdoc-args` in your `Cargo.toml`. See the [`rustdoc` documentation]
 for a list of available arguments.
 
