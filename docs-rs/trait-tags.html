@@ -16,15 +16,10 @@
         'ScheduleLabel',
         'SystemSet',
         'SystemParam',
-    ]);    
+    ]);
 
     // Find all traits that are implemented by the current type.
-    const implementedTraits = findImplementedTraits().entries();
-
-    // Filter out any traits that are not in the set of Bevy traits we care about.
-    const implementedBevyTraits = new Map(
-        [...implementedTraits].filter(([traitName, _]) => bevyTraits.has(traitName))
-    );
+    const implementedBevyTraits = findImplementedBevyTraits(document);
 
     // If we found any implemented traits, add them as tags to the top of the page.
     if (implementedBevyTraits.size > 0) {
@@ -43,16 +38,8 @@
 
         // Create a tag for each implemented trait.
         for (let [tagName, href] of implementedBevyTraits) {
-            if (tagName == 'Component') {
-                // Every `Event` also implements `Component`, but it is extremely rare
-                // to actually use events as components, so we skip the component tag for them.
-                if (implementedBevyTraits.has('Event')) {
-                    continue;
-                }
-
-                if (isImmutable) {
-                    tagName = 'Immutable Component';
-                }
+            if (tagName == 'Component' & isImmutable) {
+                tagName = 'Immutable Component';
             }
 
             // Create the tag and append it to the container.
@@ -60,13 +47,13 @@
         }
     }
 
-    function findImplementedTraits() {
+    function findImplementedBevyTraits(doc) {
         // Traits that are implemented by the current type.
         // The key is the trait name, and the value is the href to the trait's documentation.
         const implementedTraits = new Map();
 
         // Find all trait implementation headers.
-        const allTraitHeaders = document.body.querySelectorAll(
+        const allTraitHeaders = doc.body.querySelectorAll(
             '#trait-implementations-list .impl .code-header, #blanket-implementations-list .impl .code-header'
         );
 
@@ -83,15 +70,25 @@
             implementedTraits.set(traitName, href);
         }
 
-        return implementedTraits;
+        const implementedBevyTraits = new Map(
+            [...implementedTraits].filter(([traitName, _]) => bevyTraits.has(traitName))
+        );
+
+        // Every `Event` also implements `Component`, but it is extremely rare
+        // to actually use events as components, so we skip the component tag for them.
+        if (implementedBevyTraits.has('Event')) {
+            implementedBevyTraits.delete('Component')
+        }
+
+        return implementedBevyTraits;
     }
-    
+
     // Helper function to remove generics from a string of Rust code.
     // For example, 'Vec<T>' would become 'Vec'.
     function removeGenerics(str) {
         // Remove the innermost generics.
         const newStr = str.replace(/<([^<>])*>/g, '');
-        
+
         // If there are still generics, perform the removal again recursively.
         if (newStr !== str) {
             return removeGenerics(newStr);
@@ -106,7 +103,7 @@
     function createBevyTag(tagName, href) {
         const el = document.createElement('a');
         const kebabCaseName = tagName.toLowerCase().replace(' ', '-');
-        
+
         if (href) {
             el.setAttribute('href', href);
         }
@@ -114,6 +111,41 @@
         el.innerText = tagName;
         el.className = `bevy-tag ${kebabCaseName}-tag`;
         return el;
+    }
+
+
+    for (const kind of ['structs', 'enums', 'functions']) {
+        let heading = document.getElementById(kind);
+        if (!heading) {
+            continue
+        }
+        const items = [];
+        for (const item of heading.nextSibling.children) {
+            items.push(add_table_trait_labels(item))
+        }
+        Promise.all(items)
+    }
+
+    const parser = new DOMParser();
+    // Add label to a listing entry
+    async function add_table_trait_labels(item) {
+        let url = item.firstChild.firstChild.href;
+        var doc;
+        try {
+            const response = await fetch(url);
+            const fetched = await response.text();
+            doc = parser.parseFromString(fetched, 'text/html');
+        } catch (e) {
+            return
+        }
+
+        const implementedBevyTraits = findImplementedBevyTraits(doc).entries();
+
+        const div = document.createElement('div');
+        for (const [tagName, href] of implementedBevyTraits) {
+            div.append(createBevyTag(tagName, href))
+        }
+        item.prepend(div)
     }
 </script>
 
@@ -137,7 +169,8 @@
         color: white;
     }
 
-    .bevy-tag.component-tag, .bevy-tag.immutable-component-tag {
+    .bevy-tag.component-tag,
+    .bevy-tag.immutable-component-tag {
         background-color: oklch(50% 27% 95);
     }
 
@@ -153,11 +186,13 @@
         background-color: oklch(50% 27% 310);
     }
 
-    .bevy-tag.plugin-tag, .bevy-tag.plugingroup-tag {
+    .bevy-tag.plugin-tag,
+    .bevy-tag.plugingroup-tag {
         background-color: oklch(50% 27% 50);
     }
 
-    .bevy-tag.schedulelabel-tag, .bevy-tag.systemset-tag {
+    .bevy-tag.schedulelabel-tag,
+    .bevy-tag.systemset-tag {
         background-color: oklch(50% 27% 270);
     }
 

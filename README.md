@@ -22,6 +22,8 @@ you must provide absolute paths instead of relative paths for files:
 RUSTDOCFLAGS="--html-after-content path/to/docs-rs/trait-tags.html" cargo doc
 ```
 
+You can then serve the documentation with a web server like [http-server](https://lib.rs/crates/http-server).
+
 ## Building on Docs.rs
 
 Extensions can be applied to [docs.rs] builds by providing the relevant arguments
