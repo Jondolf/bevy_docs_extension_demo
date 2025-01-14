@@ -4,7 +4,7 @@ A crate for testing [rustdoc] extensions and configurations for the [Bevy game e
 
 ## Building Locally
 
-To apply the documentation extensions in this directory, you must provide `cargo doc`
+To apply documentation extensions to local builds, you must provide `cargo doc`
 with the relevant arguments for `RUSTDOCFLAGS` to configure the output of rustdoc.
 See the [`rustdoc` documentation] for a list of available arguments.
 
