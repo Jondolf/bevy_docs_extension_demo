@@ -18,6 +18,21 @@
         'SystemParam',
     ];
 
+    // TODO: When this is merged, point it to the github url.
+    // If there's a way to include arbitrary files in docs.rs, use that instead.
+    const iconBaseUrl = "/docs-rs/icons/";
+    const iconFileNames = new Map([
+        ['Component', 'component.svg'],
+        ['Resource', 'resource.svg'],
+        ['Asset', 'asset.svg'],
+        ['Event', 'event.svg'],
+        ['ScheduleLabel', 'systems-label.svg'],
+        ['Plugin', 'plugin.svg'],
+        ['PluginGroup', 'plugin.svg'],
+        ['SystemSet', 'systems-label.svg'],
+        ['SystemParam', 'system-param.svg'],
+    ]);
+
     // Find all traits that are implemented by the current type.
     const implementedBevyTraits = findImplementedBevyTraits(document);
 
@@ -149,12 +164,14 @@
     // Sort the items in the DOM and apply tags
     function apply_tags_to_listing(table, items) {
         for (const item of items.toSorted(compare_by_traits)) {
-            // Add tag
+            // Add icon
             const div = document.createElement('div');
+            div.className = 'bevy-trait-icons'
             for (const [tagName, href] of item.traits) {
-                div.append(createBevyTag(tagName, href))
+                div.append(createBevyTraitIcon(tagName, href));
             }
             item.element.prepend(div)
+
             // Change position in dom
             table.appendChild(item.element)
         }
@@ -171,6 +188,21 @@
             }
         }
         return 0;
+    }
+
+    function createBevyTraitIcon(tagName, href) {
+        const a = document.createElement("a");
+        if (href) {
+            a.setAttribute('href', href);
+        }
+
+        const kebabCaseName = tagName.toLowerCase().replace(' ', '-');
+        const template = document.createElement('template');
+        // TODO: Properly position and scale svg so it is vertically centered
+        template.innerHTML = `<svg class="${kebabCaseName}-tag bevy-trait-icon-container"><title>${tagName}</title><use xlink:href="${iconBaseUrl}${iconFileNames.get(tagName)}#icon"></use></svg>`;
+
+        a.appendChild(template.content);
+        return a;
     }
 </script>
 
@@ -194,34 +226,51 @@
         color: white;
     }
 
-    .bevy-tag.component-tag,
-    .bevy-tag.immutable-component-tag {
-        background-color: oklch(50% 27% 95);
+    .bevy-trait-icons {}
+
+    .bevy-trait-icon-container {
+        width: 14pt;
+        height: 14pt;
     }
 
-    .bevy-tag.resource-tag {
-        background-color: oklch(50% 27% 130);
+    .bevy-trait-icon {
+        width: 100%;
+        height: 100%;
+        fill: oklch(from var(--tag-color) 65% c h);
     }
 
-    .bevy-tag.asset-tag {
-        background-color: oklch(50% 27% 0);
+    .bevy-tag {
+        background-color: var(--tag-color);
     }
 
-    .bevy-tag.event-tag {
-        background-color: oklch(50% 27% 310);
+    .component-tag,
+    .immutable-component-tag {
+        --tag-color: oklch(50% 27% 95);
     }
 
-    .bevy-tag.plugin-tag,
-    .bevy-tag.plugingroup-tag {
-        background-color: oklch(50% 27% 50);
+    .resource-tag {
+        --tag-color: oklch(50% 27% 130);
     }
 
-    .bevy-tag.schedulelabel-tag,
-    .bevy-tag.systemset-tag {
-        background-color: oklch(50% 27% 270);
+    .asset-tag {
+        --tag-color: oklch(50% 27% 0);
     }
 
-    .bevy-tag.systemparam-tag {
-        background-color: oklch(50% 27% 200);
+    .event-tag {
+        --tag-color: oklch(50% 27% 310);
+    }
+
+    .plugin-tag,
+    .plugingroup-tag {
+        --tag-color: oklch(50% 27% 50);
+    }
+
+    .schedulelabel-tag,
+    .systemset-tag {
+        --tag-color: oklch(50% 27% 270);
+    }
+
+    .systemparam-tag {
+        --tag-color: oklch(50% 27% 200);
     }
 </style>
