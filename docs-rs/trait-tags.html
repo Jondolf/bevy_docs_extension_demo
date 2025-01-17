@@ -1,12 +1,12 @@
 <script>
-    // Adds tags to the top of documentation pages for common Bevy traits
-    // that are implemented by the current type, like `Component` or `Resource`.
+    // Adds tags to documentation pages for common Bevy traits like `Component` or `Resource`.
     // This makes it easier to see at a glance what types are used for.
     //
     // This extension should be passed to `rustdoc` using the `--html-after-content` flag.
 
     // Traits that we want to show as tags.
-    const bevyTraits = new Set([
+    // Order determines sort order of items in listings.
+    const bevyTraits = [
         'Component',
         'Resource',
         'Asset',
@@ -16,7 +16,7 @@
         'ScheduleLabel',
         'SystemSet',
         'SystemParam',
-    ]);
+    ];
 
     // Find all traits that are implemented by the current type.
     const implementedBevyTraits = findImplementedBevyTraits(document);
@@ -71,7 +71,7 @@
         }
 
         const implementedBevyTraits = new Map(
-            [...implementedTraits].filter(([traitName, _]) => bevyTraits.has(traitName))
+            [...implementedTraits].filter(([traitName, _]) => bevyTraits.find((x) => x == traitName))
         );
 
         // Every `Event` also implements `Component`, but it is extremely rare
@@ -113,39 +113,64 @@
         return el;
     }
 
-
+    // For item listings in modules, sort the items by implemented Bevy
+    // traits and add corresponding tags.
+    // Send off all network requests simultaneously.
     for (const kind of ['structs', 'enums', 'functions']) {
+        // Find the listing
         let heading = document.getElementById(kind);
         if (!heading) {
             continue
         }
+        const listing = heading.nextSibling;
         const items = [];
-        for (const item of heading.nextSibling.children) {
-            items.push(add_table_trait_labels(item))
+        for (const item of listing.children) {
+            let url = item.firstChild.firstChild.href;
+            items.push(
+                get_bevy_traits_for_url(url).then(
+                    (traits) => ({element: item, traits: traits})
+                )
+            );
         }
-        Promise.all(items)
+        Promise.all(items).then(
+            (items) => apply_tags_to_listing(listing, items)
+        );
     }
 
-    const parser = new DOMParser();
-    // Add label to a listing entry
-    async function add_table_trait_labels(item) {
-        let url = item.firstChild.firstChild.href;
-        var doc;
-        try {
-            const response = await fetch(url);
-            const fetched = await response.text();
-            doc = parser.parseFromString(fetched, 'text/html');
-        } catch (e) {
-            return
-        }
+    // See what Bevy traits the type whi's doc page this url points to implements.
+    // Rejects in case of network error.
+    async function get_bevy_traits_for_url(url) {
+        const response = await fetch(url);
+        const fetched = await response.text();
+        const doc = new DOMParser().parseFromString(fetched, 'text/html');
+        return findImplementedBevyTraits(doc);
+    }
 
-        const implementedBevyTraits = findImplementedBevyTraits(doc).entries();
-
-        const div = document.createElement('div');
-        for (const [tagName, href] of implementedBevyTraits) {
-            div.append(createBevyTag(tagName, href))
+    // Sort the items in the DOM and apply tags
+    function apply_tags_to_listing(table, items) {
+        for (const item of items.toSorted(compare_by_traits)) {
+            // Add tag
+            const div = document.createElement('div');
+            for (const [tagName, href] of item.traits) {
+                div.append(createBevyTag(tagName, href))
+            }
+            item.element.prepend(div)
+            // Change position in dom
+            table.appendChild(item.element)
         }
-        item.prepend(div)
+    }
+
+    function compare_by_traits(a, b) {
+        // Sorting must still work when an item impls multiple traits
+        for (const trait of bevyTraits) {
+            if (a.traits.has(trait) & !b.traits.has(trait)) {
+                return -1;
+            }
+            if (b.traits.has(trait) & !a.traits.has(trait)) {
+                return 1;
+            }
+        }
+        return 0;
     }
 </script>
 
