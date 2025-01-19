@@ -196,7 +196,6 @@
 
         const kebabCaseName = tagName.toLowerCase().replace(' ', '-');
         const template = document.createElement('template');
-        // TODO: Properly position and scale svg so it is vertically centered
         template.innerHTML = `<svg class="${kebabCaseName}-tag bevy-trait-icon-container"><title>${tagName}</title><use href="#${iconIds.get(tagName)}"></use></svg>`;
 
         a.appendChild(template.content);
