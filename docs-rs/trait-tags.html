@@ -161,7 +161,7 @@
 
     // Sort the items in the DOM and apply tags
     function applyTagsToListing(table, items) {
-        for (const item of items.toSorted(compare_by_traits)) {
+        for (const item of items.toSorted(compareByTraits)) {
             const div = document.createElement('a');
             div.className = 'bevy-trait-icons'
             // It's easy to misclick on the icon when careless, so link to the item here too.
