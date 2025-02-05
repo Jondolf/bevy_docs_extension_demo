@@ -138,7 +138,11 @@
         const listing = heading.nextSibling;
         const items = [];
         for (const item of listing.children) {
-            let url = item.firstChild.firstChild.href;
+            // Only look at items, not their description
+            if (item.nodeName != "DT") {
+                continue
+            }
+            let url = item.firstChild.href;
             items.push(
                 getBevyTraitsForUrl(url).then(
                     (traits) => ({element: item, traits: traits})
@@ -146,7 +150,7 @@
             );
         }
         Promise.all(items).then(
-            (items) => applyTagsToListing(listing, items)
+            (items) => applyTagsToItems(items)
         );
     }
 
@@ -160,21 +164,25 @@
     }
 
     // Sort the items in the DOM and apply tags
-    function applyTagsToListing(table, items) {
+    function applyTagsToItems(items) {
         for (const item of items.toSorted(compareByTraits)) {
-            const div = document.createElement('a');
-            div.className = 'bevy-trait-icons'
-            // It's easy to misclick on the icon when careless, so link to the item here too.
-            // An explanation of which component is represented is available on hover anyways.
-            div.href = item.element.firstChild.firstChild.href
-            // Add icons
-            for (const [tagName, _] of item.traits) {
-                div.append(createBevyTraitIcon(tagName));
+            const listing = item.element.parentElement;
+            const description = item.element.nextSibling;
+
+            const link = item.element.firstChild;
+            // Add icons.
+            // It's easy to misclick on the icon, so include the icon in the link to the item.
+            // An explanation of which component is represented is available on hover.
+            // Use the same order used for sorting.
+            for (const trait of bevyTraits.slice().reverse()) {
+                if (item.traits.has(trait)) {
+                    link.prepend(createBevyTraitIcon(trait));
+                }
             }
-            item.element.prepend(div)
 
             // Change position in dom
-            table.appendChild(item.element)
+            listing.appendChild(item.element);
+            listing.appendChild(description);
         }
     }
 
@@ -194,7 +202,7 @@
     function createBevyTraitIcon(tagName, href) {
         const kebabCaseName = tagName.toLowerCase().replace(' ', '-');
         const template = document.createElement('template');
-        template.innerHTML = `<svg class="${kebabCaseName}-tag bevy-trait-icon-container"><title>${tagName}</title><use href="#${iconIds.get(tagName)}"></use></svg>`;
+        template.innerHTML = `<svg class="${kebabCaseName}-tag bevy-trait-icon-instance"><title>${tagName}</title><use href="#${iconIds.get(tagName)}"></use></svg>`;
         return template.content;
     }
 </script>
@@ -219,14 +227,12 @@
         color: white;
     }
 
-    .bevy-trait-icons {
-        padding-right: 0.3em;
-        text-wrap-mode: nowrap;
-    }
-
-    .bevy-trait-icon-container {
-        width: 1.1em;
+    .bevy-trait-icon-instance {
+        width: 1.25em;
         height: 1.1em;
+
+        padding-right: 0.15em;
+        text-wrap-mode: nowrap;
         /* Couldn't find a way to automatically vertically align this,
            so manually add offset */
         position: relative;
