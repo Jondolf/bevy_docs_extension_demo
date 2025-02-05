@@ -140,19 +140,19 @@
         for (const item of listing.children) {
             let url = item.firstChild.firstChild.href;
             items.push(
-                get_bevy_traits_for_url(url).then(
+                getBevyTraitsForUrl(url).then(
                     (traits) => ({element: item, traits: traits})
                 )
             );
         }
         Promise.all(items).then(
-            (items) => apply_tags_to_listing(listing, items)
+            (items) => applyTagsToListing(listing, items)
         );
     }
 
     // See what Bevy traits the type whose doc page this url points to implements.
     // Rejects in case of network error.
-    async function get_bevy_traits_for_url(url) {
+    async function getBevyTraitsForUrl(url) {
         const response = await fetch(url);
         const fetched = await response.text();
         const doc = new DOMParser().parseFromString(fetched, 'text/html');
@@ -160,7 +160,7 @@
     }
 
     // Sort the items in the DOM and apply tags
-    function apply_tags_to_listing(table, items) {
+    function applyTagsToListing(table, items) {
         for (const item of items.toSorted(compare_by_traits)) {
             const div = document.createElement('a');
             div.className = 'bevy-trait-icons'
@@ -178,7 +178,7 @@
         }
     }
 
-    function compare_by_traits(a, b) {
+    function compareByTraits(a, b) {
         // Sorting must still work when an item impls multiple traits
         for (const trait of bevyTraits) {
             if (a.traits.has(trait) & !b.traits.has(trait)) {
