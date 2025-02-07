@@ -126,32 +126,35 @@
         return el;
     }
 
-    // For item listings in modules, sort the items by implemented Bevy
-    // traits and add corresponding tags.
-    // Send off all network requests simultaneously.
-    for (const kind of ['structs', 'enums', 'functions']) {
-        // Find the listing
-        let heading = document.getElementById(kind);
-        if (!heading) {
-            continue
-        }
-        const listing = heading.nextSibling;
-        const items = [];
-        for (const item of listing.children) {
-            // Only look at items, not their description
-            if (item.nodeName != "DT") {
+    const info_node = document.getElementById("bevy-traits-data");
+
+    if (info_node) {
+        const info = JSON.parse(info_node.innerText);
+
+        // For item listings in modules, sort the items by implemented Bevy
+        // traits and add corresponding tags.
+        // Send off all network requests simultaneously.
+        for (const kind of ['structs', 'enums', 'functions']) {
+            // Find the listing
+            let heading = document.getElementById(kind);
+            if (!heading) {
                 continue
             }
-            let url = item.firstChild.href;
-            items.push(
-                getBevyTraitsForUrl(url).then(
-                    (traits) => ({element: item, traits: traits})
-                )
-            );
+            const listing = heading.nextSibling;
+            const items = [];
+            for (const item of listing.children) {
+                // Only look at items, not their description
+                if (item.nodeName != "DT") {
+                    continue
+                }
+                let url = item.firstChild.href;
+                let name_end = url.lastIndexOf(".");
+                let name_start = url.lastIndexOf(".", name_end - 1) + 1;
+                let name = url.substring(name_start, name_end);
+                items.push({element: item, traits: new Set(info[name])});
+            }
+            applyTagsToItems(items);
         }
-        Promise.all(items).then(
-            (items) => applyTagsToItems(items)
-        );
     }
 
     // See what Bevy traits the type whose doc page this url points to implements.
