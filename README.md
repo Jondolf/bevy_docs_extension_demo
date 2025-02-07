@@ -22,8 +22,6 @@ you must provide absolute paths instead of relative paths for files:
 RUSTDOCFLAGS="--html-after-content path/to/docs-rs/trait-tags.html" cargo doc
 ```
 
-You can then serve the documentation with a web server like [http-server](https://lib.rs/crates/http-server).
-
 ## Building on Docs.rs
 
 Extensions can be applied to [docs.rs] builds by providing the relevant arguments
@@ -44,6 +42,19 @@ See [`Cargo.toml`](./Cargo.toml) for the configuration passed to [docs.rs] for b
 [rustdoc]: https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html
 [`rustdoc` documentation]: https://doc.rust-lang.org/rustdoc/command-line-arguments.html
 [Bevy game engine]: https://bevyengine.org
+
+## Trait tags
+
+This extension adds tags on types to indicate usage based on Bevy traits such as `Component`, `Event`, etc.
+
+For trait tags to show in listings, metadata needs to be embedded withing the source files. You likely do not want to commit this to version control on a branch that receives new manual changes.
+Run the `embed-trait-info` tool and point it at your project workspace, e.g.
+
+```bash
+embed-trait-info/target/release/embed-trait-info .
+```
+
+before building the documentation as above.
 
 ## License
 

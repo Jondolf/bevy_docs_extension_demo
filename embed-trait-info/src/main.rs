@@ -18,20 +18,6 @@ fn main() {
     run(root_dir, package_names(root_dir));
 }
 
-fn run(root_dir: &str, packages: Vec<String>) {
-    // Generate documentation as json
-    Command::new("cargo")
-        .args(["doc", "--all-features", "--workspace"])
-        .env("RUSTDOCFLAGS", "-Z unstable-options --output-format json")
-        .current_dir(root_dir)
-        .status()
-        .expect("Failed to run cargo doc in {root_dir}");
-
-    for package in packages {
-        add_info_to_package_source(root_dir, &package);
-    }
-}
-
 // Can be removed when this gets run by Bevy's publish.sh,
 // as that knows the precise list of crates to publish.
 fn package_names(root_dir: &str) -> Vec<String> {
@@ -54,6 +40,20 @@ fn package_names(root_dir: &str) -> Vec<String> {
         .collect()
 }
 
+fn run(root_dir: &str, packages: Vec<String>) {
+    // Generate documentation as json
+    Command::new("cargo")
+        .args(["doc", "--all-features", "--workspace"])
+        .env("RUSTDOCFLAGS", "-Z unstable-options --output-format json")
+        .current_dir(root_dir)
+        .status()
+        .expect("Failed to run cargo doc in {root_dir}");
+
+    for package in packages {
+        add_info_to_package_source(root_dir, &package);
+    }
+}
+
 fn add_info_to_package_source(root_dir: &str, package: &str) {
     let root_dir = PathBuf::from(root_dir);
     let file_name = root_dir.join(format!("target/doc/{package}.json"));
@@ -66,7 +66,6 @@ fn add_info_to_package_source(root_dir: &str, package: &str) {
         }
     };
     let crate_doc: Crate = serde_json::from_reader(file).unwrap();
-    assert_eq!(crate_doc.format_version, 39);
 
     for (module_span, info) in info_for_modules(&crate_doc) {
         let source_file = root_dir.join(&module_span.filename);
