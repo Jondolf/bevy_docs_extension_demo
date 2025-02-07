@@ -9,38 +9,7 @@ use std::{
 use base64::prelude::*;
 use rustdoc_types::{Crate, Item, ItemEnum, Span};
 
-fn main() {
-    // Temporary entrypoint, to be replaced if this is integrated in the CI tool
-    let args = std::env::args().collect::<Vec<_>>();
-    assert!(args.len() <= 2);
-    let root_dir = args.get(1).map_or(".", |s| s);
-
-    run(root_dir, package_names(root_dir));
-}
-
-// Can be removed when this gets run by Bevy's publish.sh,
-// as that knows the precise list of crates to publish.
-fn package_names(root_dir: &str) -> Vec<String> {
-    let output = Command::new("cargo")
-        .args(["metadata", "--no-deps", "--format-version", "1"])
-        .current_dir(root_dir)
-        .output()
-        .unwrap();
-    if !output.status.success() {
-        panic!("Failed to read manifest");
-    }
-    let manifest = serde_json::from_slice::<serde_json::Value>(&output.stdout).unwrap();
-    manifest
-        .get("packages")
-        .unwrap()
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|package| package.get("name").unwrap().as_str().unwrap().to_owned())
-        .collect()
-}
-
-fn run(root_dir: &str, packages: Vec<String>) {
+pub fn run(root_dir: &str, packages: Vec<String>) {
     // Generate documentation as json
     Command::new("cargo")
         .args(["doc", "--all-features", "--workspace"])
@@ -57,13 +26,9 @@ fn run(root_dir: &str, packages: Vec<String>) {
 fn add_info_to_package_source(root_dir: &str, package: &str) {
     let root_dir = PathBuf::from(root_dir);
     let file_name = root_dir.join(format!("target/doc/{package}.json"));
-    let file = match File::open(&file_name) {
+    let file = match File::open(&file_name).expect() {
         Ok(file) => file,
-        Err(e) => {
-            // When we have a precise list of crates, this can just be turned into a panic
-            eprintln!("failed to open {file_name:?}: {e}");
-            return;
-        }
+        Err(e) => panic!("failed to open {file_name:?}: {e}"),
     };
     let crate_doc: Crate = serde_json::from_reader(file).unwrap();
 

@@ -51,7 +51,7 @@ For trait tags to show in listings, metadata needs to be embedded withing the so
 Run the `embed-trait-info` tool and point it at your project workspace, e.g.
 
 ```bash
-embed-trait-info/target/release/embed-trait-info .
+embed-trait-info my_crate
 ```
 
 before building the documentation as above.
