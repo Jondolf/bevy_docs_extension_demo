@@ -6,6 +6,7 @@ use std::{
     sync::LazyLock,
 };
 
+use base64::prelude::*;
 use rustdoc_types::{Crate, Item, ItemEnum, Span};
 
 fn main() {
@@ -73,17 +74,22 @@ fn add_info_to_package_source(root_dir: &str, package: &str) {
         let pos = position_in_string(&src, module_span.begin);
 
         // Insert data about implemented traits as a doc comment.
-        // The cfg prevents this from showing up in rust-analyzer,
-        // the css prevents this from being visible on the web (including to screen readers),
-        // and the id lets the ECMAScript find the data.
+        // Using an empty link prevents this from showing up in rust-analyzer
+        // or on the web (including html screen readers, with the css).
+        // The id lets the ECMAScript find the data.
+        //
+        // Using an invisible div would still show up in RA, and we can't put
+        // it behind a cfg(doc) as rustfmt flags do not get passed to dependencies.
+        let json = serde_json::to_string(&info).unwrap();
+        let as_base64 = BASE64_STANDARD.encode(json);
         let new_src = format!(
             r#"
             {}
-            #![cfg_attr(doc, doc = "<div id=\"bevy-traits-data\" style=\"display:none\">{}</div>")]
+            #![doc = "<a id=\"bevy-traits-data\" style=\"display:none\" href=\"data:application/json;base64,{}\"></a>"]
             {}
             "#,
             src[..pos].to_owned(),
-            serde_json::to_string(&info).unwrap().replace('"', "\\\""),
+            as_base64,
             &src[pos..]
         );
 

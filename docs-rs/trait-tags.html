@@ -129,7 +129,11 @@
     const info_node = document.getElementById("bevy-traits-data");
 
     if (info_node) {
-        const info = JSON.parse(info_node.innerText);
+        const data_uri = info_node.href;
+        const base64_index = data_uri.indexOf(",") + 1;
+        const base64 = data_uri.substring(base64_index);
+        const json = atob(base64)
+        const info = JSON.parse(json);
 
         // For item listings in modules, sort the items by implemented Bevy
         // traits and add corresponding tags.
