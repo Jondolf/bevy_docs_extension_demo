@@ -26,7 +26,7 @@ pub fn run(root_dir: &str, packages: Vec<String>) {
 fn add_info_to_package_source(root_dir: &str, package: &str) {
     let root_dir = PathBuf::from(root_dir);
     let file_name = root_dir.join(format!("target/doc/{package}.json"));
-    let file = match File::open(&file_name).expect() {
+    let file = match File::open(&file_name) {
         Ok(file) => file,
         Err(e) => panic!("failed to open {file_name:?}: {e}"),
     };
