@@ -20,3 +20,6 @@ rustdoc-args = [
     "--html-after-content",
     "docs-rs/trait-tags.html",
 ]
+
+[workspace]
+members = ["embed-trait-info"]
