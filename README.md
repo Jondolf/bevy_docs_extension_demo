@@ -43,7 +43,7 @@ See [`Cargo.toml`](./Cargo.toml) for the configuration passed to [docs.rs] for b
 [`rustdoc` documentation]: https://doc.rust-lang.org/rustdoc/command-line-arguments.html
 [Bevy game engine]: https://bevyengine.org
 
-## Trait tags
+## Trait Tags
 
 This extension adds tags on types to indicate usage based on Bevy traits such as `Component`, `Event`, etc.
 
