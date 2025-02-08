@@ -47,7 +47,7 @@ See [`Cargo.toml`](./Cargo.toml) for the configuration passed to [docs.rs] for b
 
 This extension adds tags on types to indicate usage based on Bevy traits such as `Component`, `Event`, etc.
 
-For trait tags to show in listings, metadata needs to be embedded withing the source files. You likely do not want to commit this to version control on a branch that receives new manual changes.
+For trait tags to show in listings, metadata needs to be embedded within the source files. You likely do not want to commit this to version control on a branch that receives new manual changes.
 Run the `embed-trait-info` tool and point it at your project workspace, e.g.
 
 ```bash
