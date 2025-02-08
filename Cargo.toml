@@ -22,6 +22,4 @@ rustdoc-args = [
 ]
 
 [workspace]
-members = [
-    "embed-trait-info",
-]
+members = ["embed-trait-info"]
