@@ -160,15 +160,6 @@
         }
     }
 
-    // See what Bevy traits the type whose doc page this url points to implements.
-    // Rejects in case of network error.
-    async function getBevyTraitsForUrl(url) {
-        const response = await fetch(url);
-        const fetched = await response.text();
-        const doc = new DOMParser().parseFromString(fetched, 'text/html');
-        return findImplementedBevyTraits(doc);
-    }
-
     // Sort the items in the DOM and apply tags
     function applyTagsToItems(items) {
         for (const item of items.toSorted(compareByTraits)) {
