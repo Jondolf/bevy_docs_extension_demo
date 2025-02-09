@@ -12,14 +12,14 @@ For example, building the docs with the `trait-tags` extension and `--no-deps` c
 with the following command:
 
 ```bash
-RUSTDOCFLAGS="--html-after-content docs-rs/trait-tags.html" cargo doc --no-deps
+RUSTDOCFLAGS="--html-after-content docs-rs/trait-tags.html --cfg docsrs_dep" RUSTFLAGS="--cfg docsrs_dep" cargo doc --no-deps
 ```
 
 Note that if documentation is also built for other dependencies,
 you must provide absolute paths instead of relative paths for files:
 
 ```bash
-RUSTDOCFLAGS="--html-after-content path/to/docs-rs/trait-tags.html" cargo doc
+RUSTDOCFLAGS="--html-after-content /path/to/docs-rs/trait-tags.html --cfg docsrs_dep" RUSTFLAGS="--cfg docsrs_dep" cargo doc
 ```
 
 ## Building on Docs.rs
