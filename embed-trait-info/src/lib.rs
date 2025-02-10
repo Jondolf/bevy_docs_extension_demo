@@ -1,18 +1,17 @@
 use std::{
     collections::{HashMap, HashSet},
-    fs::{read_to_string, File},
+    fs::{File, read_to_string},
     path::PathBuf,
     process::Command,
     sync::LazyLock,
 };
 
-use base64::prelude::*;
 use rustdoc_types::{Crate, Item, ItemEnum, Span};
 
 pub fn run(root_dir: &str, packages: Vec<String>) {
     // Generate documentation as json
     Command::new("cargo")
-        .args(["doc", "--all-features", "--workspace"])
+        .args(["doc", "--all-features", "--workspace", "--no-deps"])
         .env("RUSTDOCFLAGS", "-Z unstable-options --output-format json")
         .current_dir(root_dir)
         .status()
@@ -38,22 +37,16 @@ fn add_info_to_package_source(root_dir: &str, package: &str) {
         let pos = position_in_string(&src, module_span.begin);
 
         // Insert data about implemented traits as a doc comment.
-        // Using an empty link prevents this from showing up in rust-analyzer
-        // or on the web (including html screen readers, with the css).
         // The id lets the ECMAScript find the data.
-        //
-        // Using an invisible div would still show up in RA, and we can't put
-        // it behind a cfg(doc) as rustfmt flags do not get passed to dependencies.
         let json = serde_json::to_string(&info).unwrap();
-        let as_base64 = BASE64_STANDARD.encode(json);
         let new_src = format!(
             r#"
             {}
-            #![doc = "<a id=\"bevy-traits-data\" style=\"display:none\" href=\"data:application/json;base64,{}\"></a>"]
+            #![cfg_attr(docsrs_dep, doc = "<div id=\"bevy-traits-data\" style=\"display:none\">{}</div>")]
             {}
             "#,
             src[..pos].to_owned(),
-            as_base64,
+            json.replace('"', "\\\""),
             &src[pos..]
         );
 

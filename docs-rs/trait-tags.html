@@ -129,11 +129,7 @@
     const info_node = document.getElementById("bevy-traits-data");
 
     if (info_node) {
-        const data_uri = info_node.href;
-        const base64_index = data_uri.indexOf(",") + 1;
-        const base64 = data_uri.substring(base64_index);
-        const json = atob(base64)
-        const info = JSON.parse(json);
+        const info = JSON.parse(info_node.innerText);
 
         // For item listings in modules, sort the items by implemented Bevy
         // traits and add corresponding tags.
@@ -158,15 +154,6 @@
             }
             applyTagsToItems(items);
         }
-    }
-
-    // See what Bevy traits the type whose doc page this url points to implements.
-    // Rejects in case of network error.
-    async function getBevyTraitsForUrl(url) {
-        const response = await fetch(url);
-        const fetched = await response.text();
-        const doc = new DOMParser().parseFromString(fetched, 'text/html');
-        return findImplementedBevyTraits(doc);
     }
 
     // Sort the items in the DOM and apply tags
